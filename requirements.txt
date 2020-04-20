@@ -4,3 +4,5 @@ pytest
 pytest-django
 djangorestframework
 djangorestframework-simplejwt
+pylint
+pylint-django
