@@ -1,8 +1,8 @@
 from django.core.exceptions import PermissionDenied
 from rest_framework import viewsets
 
-from .models import Comment, Post
-from .serializers import CommentSerializer, PostSerializer
+from .models import Comment, Post, Group
+from .serializers import CommentSerializer, PostSerializer, GroupSerializer
 
 
 class ApiPostViewSet(viewsets.ModelViewSet):
@@ -12,6 +12,14 @@ class ApiPostViewSet(viewsets.ModelViewSet):
     '''
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        queryset = Post.objects.all()
+        #  получаем параметр group из GET-запроса, если group передан
+        group = self.request.query_params.get('group', None)
+        if group is not None:
+            queryset = queryset.filter(group=group)
+        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -54,3 +62,11 @@ class ApiCommentViewSet(viewsets.ModelViewSet):
         if instance.author != self.request.user:
             raise PermissionDenied
         instance.delete()
+
+
+class ApiGroupViewSet(viewsets.ModelViewSet):
+    '''
+    List all groups, or create a new group.
+    '''
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
