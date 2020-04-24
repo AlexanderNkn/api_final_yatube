@@ -1,5 +1,6 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
-from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .models import Comment, Follow, Group, Post, User
@@ -14,14 +15,17 @@ class ApiPostViewSet(viewsets.ModelViewSet):
     '''
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['group']
 
-    def get_queryset(self):
-        queryset = Post.objects.all()
-        # get group from GET-request, if group exists
-        group = self.request.query_params.get('group', None)
-        if group is not None:
-            queryset = get_list_or_404(queryset, group=group)
-        return queryset
+#    Предыдущий рабочий вариант, оставил на память
+#    def get_queryset(self):
+#        queryset = Post.objects.all()
+#        # get group from GET-request, if group exists
+#        group = self.request.query_params.get('group', None)
+#        if group is not None:
+#            queryset = get_list_or_404(queryset, group=group)
+#        return queryset
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -79,16 +83,19 @@ class ApiFollowViewSet(viewsets.ModelViewSet):
     '''
     queryset = Follow.objects.all()
     serializer_class = FollowSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['=user__username', '=following__username']
 
-    def get_queryset(self):
-        queryset = Follow.objects.all()
-        # get 'username' from GET-request, if 'search' exists
-        username = self.request.query_params.get('search', None)
-        if username is not None:
-            queryset1 = queryset.filter(user__username=username)
-            queryset2 = queryset.filter(following__username=username)
-            queryset = queryset1 | queryset2
-        return queryset 
+#    Предыдущий рабочий вариант, оставил на память
+#    def get_queryset(self):
+#        queryset = Follow.objects.all()
+#        # get 'username' from GET-request, if 'search' exists
+#        username = self.request.query_params.get('search', None)
+#        if username is not None:
+#            queryset1 = queryset.filter(user__username=username)
+#            queryset2 = queryset.filter(following__username=username)
+#            queryset = queryset1 | queryset2
+#        return queryset 
 
     def perform_create(self, serializer):
         # check if request.user already followed by author
