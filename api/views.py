@@ -1,4 +1,4 @@
-from django.shortcuts import get_list_or_404
+from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework import viewsets
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
@@ -47,9 +47,8 @@ class ApiCommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def get_queryset(self):
-        post_id = self.kwargs.get('post_id')
-        return Comment.objects.filter(post__id=post_id)
-
+        post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
+        return post.comments
     def perform_create(self, serializer):
         post = Post.objects.get(id=self.kwargs.get('post_id'))
         serializer.save(author=self.request.user, post=post)
