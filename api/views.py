@@ -1,5 +1,6 @@
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from django.shortcuts import get_list_or_404
 from rest_framework import viewsets
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .models import Comment, Follow, Group, Post, User
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
@@ -19,7 +20,7 @@ class ApiPostViewSet(viewsets.ModelViewSet):
         # get group from GET-request, if group exists
         group = self.request.query_params.get('group', None)
         if group is not None:
-            queryset = queryset.filter(group=group)
+            queryset = get_list_or_404(queryset, group=group)
         return queryset
 
     def perform_create(self, serializer):
