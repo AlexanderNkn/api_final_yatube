@@ -7,7 +7,7 @@ api final
 - настройте виртуальное окружение
 - склонируйте проект с реппозитория GitHub
 - установите необходимые библиотеки 
-    '<pip install -r requirements.txt>'
+    pip install -r requirements.txt
 - запустите проект
     '''
     python manage.py runserver
