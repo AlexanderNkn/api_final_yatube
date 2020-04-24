@@ -85,8 +85,10 @@ class ApiFollowViewSet(viewsets.ModelViewSet):
         # get 'username' from GET-request, if 'search' exists
         username = self.request.query_params.get('search', None)
         if username is not None:
-            queryset = queryset.filter(user__username=username)
-        return queryset
+            queryset1 = queryset.filter(user__username=username)
+            queryset2 = queryset.filter(following__username=username)
+            queryset = queryset1 | queryset2
+        return queryset 
 
     def perform_create(self, serializer):
         # check if request.user already followed by author
