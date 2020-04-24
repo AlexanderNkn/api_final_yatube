@@ -10,6 +10,7 @@ router = DefaultRouter()
 router.register(r'posts', views.ApiPostViewSet)
 router.register(r'posts/(?P<post_id>\d+)/comments', views.ApiCommentViewSet)
 router.register(r'group', views.ApiGroupViewSet)
+router.register(r'follow', views.ApiFollowViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

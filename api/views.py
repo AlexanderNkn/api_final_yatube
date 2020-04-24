@@ -1,8 +1,9 @@
-from django.core.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework import viewsets
 
-from .models import Comment, Post, Group
-from .serializers import CommentSerializer, PostSerializer, GroupSerializer
+from .models import Comment, Follow, Group, Post, User
+from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
+                          PostSerializer)
 
 
 class ApiPostViewSet(viewsets.ModelViewSet):
@@ -15,7 +16,7 @@ class ApiPostViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = Post.objects.all()
-        #  получаем параметр group из GET-запроса, если group передан
+        # get group from GET-request, if group exists
         group = self.request.query_params.get('group', None)
         if group is not None:
             queryset = queryset.filter(group=group)
@@ -70,3 +71,29 @@ class ApiGroupViewSet(viewsets.ModelViewSet):
     '''
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+
+
+class ApiFollowViewSet(viewsets.ModelViewSet):
+    '''
+    List all followers, or subscribe to another author.
+    '''
+    queryset = Follow.objects.all()
+    serializer_class = FollowSerializer
+
+    def get_queryset(self):
+        queryset = Follow.objects.all()
+        # get 'username' from GET-request, if 'search' exists
+        username = self.request.query_params.get('search', None)
+        if username is not None:
+            queryset = queryset.filter(user__username=username)
+        return queryset
+
+    def perform_create(self, serializer):
+        # check if request.user already followed by author
+        new_following_username = self.request.data.get('following', None)
+        new_following = User.objects.get(username=new_following_username)
+        already_following = Follow.objects.filter(user=self.request.user)
+        already_following_list = [item.following for item in already_following]
+        if new_following in already_following_list:
+            raise ValidationError('You are already followed by author')
+        serializer.save(user=self.request.user)
