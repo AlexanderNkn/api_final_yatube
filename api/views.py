@@ -1,7 +1,6 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
-from rest_framework.exceptions import ValidationError
 
 from .models import Comment, Follow, Group, Post, User
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
@@ -59,16 +58,5 @@ class ApiFollowViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['=user__username', '=following__username']
 
-    def validate_following(self, value):
-        '''
-        Check if request.user already followed by author
-        '''
-        new_following_username = self.request.data.get('following', None)
-        new_following = User.objects.get(username=new_following_username)
-        if Follow.objects.filter(user=self.request.user, following=new_following).exists():
-            raise ValidationError('You are already followed by author')
-        return value
-
     def perform_create(self, serializer):
-        self.validate_following(serializer)
         serializer.save(user=self.request.user)
