@@ -38,10 +38,14 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def validate_following(self, value):
         '''
-        Check if request.user already followed by author
+        Check if request.user is already subscribed to the author or
+        request.user is trying to subscribe to itself
         '''
-        if Follow.objects.filter(user=self.context['request'].user, following=value).exists():
+        user=self.context['request'].user
+        if Follow.objects.filter(user=user, following=value).exists():
             raise ValidationError('You are already followed by author')
+        elif user == value:
+            raise ValidationError('Do you really want to subscribe to yourself?')
         return value
 
     class Meta:
