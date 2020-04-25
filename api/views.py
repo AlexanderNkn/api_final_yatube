@@ -1,11 +1,12 @@
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import ValidationError
 
 from .models import Comment, Follow, Group, Post, User
 from .serializers import (CommentSerializer, FollowSerializer, GroupSerializer,
                           PostSerializer)
+from .permissions import IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly
 
 
 class ApiPostViewSet(viewsets.ModelViewSet):
@@ -15,22 +16,12 @@ class ApiPostViewSet(viewsets.ModelViewSet):
     '''
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly & IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['group']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
-        post = Post.objects.get(pk=self.kwargs.get('pk'))
-        if post.author != self.request.user:
-            raise PermissionDenied
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise PermissionDenied
-        instance.delete()
 
 
 class ApiCommentViewSet(viewsets.ModelViewSet):
@@ -40,24 +31,15 @@ class ApiCommentViewSet(viewsets.ModelViewSet):
     '''
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly & IsOwnerOrReadOnly]
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         return post.comments
+
     def perform_create(self, serializer):
         post = Post.objects.get(id=self.kwargs.get('post_id'))
         serializer.save(author=self.request.user, post=post)
-
-    def perform_update(self, serializer):
-        comment = Comment.objects.get(pk=self.kwargs.get('pk'))
-        if comment.author != self.request.user:
-            raise PermissionDenied
-        serializer.save()
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise PermissionDenied
-        instance.delete()
 
 
 class ApiGroupViewSet(viewsets.ModelViewSet):
