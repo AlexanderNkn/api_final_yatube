@@ -22,3 +22,6 @@ db.sqlite3
 .vscode/
 api/migrations/
 .env
+
+# old versions of views
+api/views_var1.py

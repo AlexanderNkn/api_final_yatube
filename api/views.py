@@ -18,15 +18,6 @@ class ApiPostViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['group']
 
-#    Предыдущий рабочий вариант, оставил на память
-#    def get_queryset(self):
-#        queryset = Post.objects.all()
-#        # get group from GET-request, if group exists
-#        group = self.request.query_params.get('group', None)
-#        if group is not None:
-#            queryset = get_list_or_404(queryset, group=group)
-#        return queryset
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
@@ -86,23 +77,16 @@ class ApiFollowViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['=user__username', '=following__username']
 
-#    Предыдущий рабочий вариант, оставил на память
-#    def get_queryset(self):
-#        queryset = Follow.objects.all()
-#        # get 'username' from GET-request, if 'search' exists
-#        username = self.request.query_params.get('search', None)
-#        if username is not None:
-#            queryset1 = queryset.filter(user__username=username)
-#            queryset2 = queryset.filter(following__username=username)
-#            queryset = queryset1 | queryset2
-#        return queryset 
-
-    def perform_create(self, serializer):
-        # check if request.user already followed by author
+    def validate_following(self, value):
+        '''
+        Check if request.user already followed by author
+        '''
         new_following_username = self.request.data.get('following', None)
         new_following = User.objects.get(username=new_following_username)
-        already_following = Follow.objects.filter(user=self.request.user)
-        already_following_list = [item.following for item in already_following]
-        if new_following in already_following_list:
+        if Follow.objects.filter(user=self.request.user, following=new_following).exists():
             raise ValidationError('You are already followed by author')
+        return value
+
+    def perform_create(self, serializer):
+        self.validate_following(serializer)
         serializer.save(user=self.request.user)
