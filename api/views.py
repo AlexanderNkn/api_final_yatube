@@ -37,7 +37,7 @@ class ApiCommentViewSet(viewsets.ModelViewSet):
         return post.comments
 
     def perform_create(self, serializer):
-        post = Post.objects.get(id=self.kwargs.get('post_id'))
+        post = Post.objects.get(pk=self.kwargs.get('post_id'))
         serializer.save(author=self.request.user, post=post)
 
 
