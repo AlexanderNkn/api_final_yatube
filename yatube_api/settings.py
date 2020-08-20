@@ -105,5 +105,14 @@ REST_FRAMEWORK = {
 
 # set token lifetime
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=360),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=720),
 }
+
+# Logging
+if DEBUG:
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler"}},
+        "loggers": {"django.db.backends": {"handlers": ["console"], "level": "DEBUG"}},
+    }
