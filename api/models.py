@@ -12,6 +12,9 @@ class Group(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        db_table = 'posts_group'
+
 
 class Post(models.Model):
     '''Модель постов пользователей'''
@@ -23,6 +26,9 @@ class Post(models.Model):
     def __str__(self):
         return self.text
 
+    class Meta:
+        db_table = 'posts_post'
+
 
 class Comment(models.Model):
     '''Модель постов пользователей'''
@@ -30,6 +36,12 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     text = models.TextField()
     created = models.DateTimeField('Дата добавления', auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        db_table = 'posts_comment'
 
 
 class Follow(models.Model):
@@ -39,3 +51,4 @@ class Follow(models.Model):
 
     class Meta:
         unique_together = ('following', 'user')
+        db_table = 'posts_follow'
