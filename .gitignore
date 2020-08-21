@@ -25,3 +25,7 @@ api/migrations/
 
 # old versions of views
 api/views_var1.py
+
+# static
+static/admin/
+static/rest_framework/
