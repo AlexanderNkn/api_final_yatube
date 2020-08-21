@@ -13,7 +13,7 @@ class ApiPostViewSet(viewsets.ModelViewSet):
     List all posts, or create a new post.
     Retrieve, update or delete selected post.
     '''
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by("-pub_date")
     serializer_class = PostSerializer
     permission_classes = [IsAuthenticatedOrReadOnly & IsOwnerOrReadOnly]
     filter_backends = [DjangoFilterBackend]
@@ -28,7 +28,7 @@ class ApiCommentViewSet(viewsets.ModelViewSet):
     List all comments, or create a new comment for selected post.
     Retrieve, update or delete selected comment.
     '''
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.all().order_by("-created")
     serializer_class = CommentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly & IsOwnerOrReadOnly]
 
