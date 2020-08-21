@@ -10,10 +10,12 @@ attrs==19.3.0             # via pytest
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 django-dotenv==1.4.2      # via -r requirements.in
+django-environ==0.4.5     # via -r requirements.in
 django-filter==2.3.0      # via -r requirements.in
 django==3.1               # via -r requirements.in, django-filter, djangorestframework, djangorestframework-simplejwt
 djangorestframework-simplejwt==4.4.0  # via -r requirements.in
 djangorestframework==3.11.1  # via -r requirements.in, djangorestframework-simplejwt
+gunicorn==20.0.4          # via -r requirements.in
 idna==2.10                # via requests
 iniconfig==1.0.1          # via pytest
 isort==4.3.21             # via pylint
@@ -22,6 +24,7 @@ mccabe==0.6.1             # via pylint
 more-itertools==8.4.0     # via pytest
 packaging==20.4           # via pytest
 pluggy==0.13.1            # via pytest
+psycopg2-binary==2.8.5    # via -r requirements.in
 py==1.9.0                 # via pytest
 pyjwt==1.7.1              # via djangorestframework-simplejwt
 pylint-django==2.3.0      # via -r requirements.in
@@ -37,3 +40,6 @@ sqlparse==0.3.1           # via django
 toml==0.10.1              # via pylint, pytest
 urllib3==1.25.10          # via requests
 wrapt==1.12.1             # via astroid
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools

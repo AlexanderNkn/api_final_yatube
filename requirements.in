@@ -8,3 +8,6 @@ pylint
 pylint-django
 django-dotenv
 django-filter
+gunicorn
+psycopg2-binary
+django-environ
