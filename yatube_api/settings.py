@@ -1,19 +1,28 @@
 import os
 from datetime import timedelta
+import environ
 
-# опять на яндекс.практикуме не работает подгрузка переменных из env
-# from dotenv import load_dotenv
-# load_dotenv()
 
+# import passwords
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
+# reading .env file
+environ.Env.read_env()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# SECRET_KEY = os.getenv('SECRET_KEY')
 SECRET_KEY = 'hhz7l-ltdismtf@bzyz+rple7*s*w$jak%whj@(@u0eok^f9k4'
 
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "130.193.36.25",
+    "api.blog-yatube.ml",
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -57,12 +66,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'yatube_api.wsgi.application'
 
+# for postgres
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    'default': env.db(), 
 }
+
+## for sqlite
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#    }
+#}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -90,18 +105,18 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
-
-REST_FRAMEWORK = {        
-        'DEFAULT_PERMISSION_CLASSES': [
-            'rest_framework.permissions.IsAuthenticatedOrReadOnly',
-        ],
-        'DEFAULT_AUTHENTICATION_CLASSES': [
-            'rest_framework_simplejwt.authentication.JWTAuthentication',
-            'rest_framework.authentication.SessionAuthentication',
-        ],
-    }
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
 
 # set token lifetime
 SIMPLE_JWT = {
@@ -110,9 +125,9 @@ SIMPLE_JWT = {
 
 # Logging
 if DEBUG:
-    LOGGING = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler"}},
-        "loggers": {"django.db.backends": {"handlers": ["console"], "level": "DEBUG"}},
-    }
+   LOGGING = {
+       "version": 1,
+       "disable_existing_loggers": False,
+       "handlers": {"console": {"level": "DEBUG", "class": "logging.StreamHandler"}},
+       "loggers": {"django.db.backends": {"handlers": ["console"], "level": "DEBUG"}},
+   }
