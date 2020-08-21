@@ -31,7 +31,7 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
-    following = serializers.SlugRelatedField(
+    author = serializers.SlugRelatedField(
         slug_field='username', queryset=User.objects.all()
     )
     user = serializers.ReadOnlyField(source='user.username')
@@ -42,7 +42,7 @@ class FollowSerializer(serializers.ModelSerializer):
         request.user is trying to subscribe to itself
         '''
         user=self.context['request'].user
-        if Follow.objects.filter(user=user, following=value).exists():
+        if Follow.objects.filter(user=user, author=value).exists():
             raise ValidationError('You are already followed by author')
         elif user == value:
             raise ValidationError('Do you really want to subscribe to yourself?')

@@ -46,9 +46,9 @@ class Comment(models.Model):
 
 class Follow(models.Model):
     '''Модель подписки на авторов'''
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
 
     class Meta:
-        unique_together = ('following', 'user')
+        unique_together = ('author', 'user')
         db_table = 'posts_follow'
